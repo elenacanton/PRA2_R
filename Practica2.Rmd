@@ -1,0 +1,623 @@
+---
+title: "practica 2"
+author: "meeu"
+date: "7/5/2021"
+output: html_document
+---
+
+
+
+1. Descripción del dataset. ¿Por qué es importante y qué pregunta/problema pretende responder?
+
+#describir el dataset.
+#Red Wine Quality (https://www.kaggle.com/uciml/red-wine-quality-cortez-et-al-2009)
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+
+setwd("C:/")
+
+data <- read.csv("winequality-red.csv", header = TRUE)
+head(data)
+
+```
+
+
+```{r}
+# contamos el numero de registros
+NROW(data)
+```
+
+```{r}
+# Tipo de dato asignado a cada campo
+sapply(data, function(x) class(x))
+
+```
+
+2. Integración y selección de los datos de interés a analizar.
+
+#En el caso de los datos utilizados para este ejercicio solamente hay un dataset.La integración o fusión de los datos consiste en la combinación de datos procedentes de múltiples fuentes, con el fin de crear una estructura de datos coherente y única que contenga mayor cantidad de información.
+#De lo anterior el aparatado de integración no aplica, al conjunto de datos seleccionados.
+
+#selección de variables:
+#ideas a valorar solo analizar las muestras cuya calidad sea superior al 7?
+
+
+#En esta fase también es habitual realizar una exploración de los datos (screening, en inglés), con el objetivo de analizar globalmente sus características e identificar fuertes correlaciones entre atributos, de modo que se pueda prescindir de aquella información más redundante.
+
+
+#Idea a valorar: prodiamos analizar las variables. análisis de componentes principales (ACP),
+##apartado análisis de componentes principales (ACP),
+
+```{r}
+
+##Análisis de componentes principales (ACP),
+
+data.pca <- prcomp(data[,c(1:11)], center = TRUE, scale = TRUE)
+summary(data.pca)
+
+```
+#El resultado son 11 componentes principales (PC1-PC11), cada una de las cuales explica un porcentaje de varianza del dataset original. Así, la primera componente principal explica prácticamente 2/3 de la varianza total y las 5 primeras componentes describen en torno al 80 % de la varianza. Dado que las ocho primeras componentes ya explican en torno al 95 % de la varianza,
+
+
+
+
+3. Limpieza de los datos.
+
+
+
+3.1. ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos?
+
+
+```{r}
+# Números de valores desconocidos por campo
+sapply(data, function(x) sum(is.na(x)))
+
+```
+Respuesta: Se observa que no existen valores NA en el dataset.
+
+
+```{r}
+#vemos que porcentaje por columnas tienen los valores 0
+
+colSums(data==0)/nrow(data)*100
+```
+
+
+```{r}
+# Números de valores 0 por campo
+colSums(data==0)
+
+
+
+```
+Respuesta: Se observa que existen valores 0, en la variable "citric.acid" hay 132 observaciones igual a 0.
+
+
+
+```{r}
+attach(data)
+
+#Observamos la distribuccion de los valores de la variable :citric.acid
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(citric.acid)
+boxplot(citric.acid)
+
+```
+>Respuesta: se entiende que las observaciones pueden ser valores reales y que estan correctamente informados.
+De lo anterior no aplicaremos conversiones para estos datos.
+
+
+```{r}
+
+# Números de valores enpty por campo
+sapply(data, function(x) sum(data==""))
+
+
+
+```
+
+Respuesta: Se observa no existen campos no informados en el dataset.
+
+
+```{r}
+#Revisamos el dataset.
+summary(data)
+
+```
+
+
+
+3.2. Identificación y tratamiento de valores extremos.
+
+Respuesta: A continuación vamos a explorar mas detalladamente las variables para analizar la existencia de valores extremos.
+
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(fixed.acidity)
+boxplot(fixed.acidity)
+```
+
+
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(volatile.acidity )
+boxplot(volatile.acidity )
+
+
+```
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(citric.acid)
+boxplot(citric.acid)
+
+```
+```{r}
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(residual.sugar)
+boxplot(residual.sugar)
+
+```
+
+
+```{r}
+
+#existen mas de 15o valores extremos en esta variable
+boxplot.stats(residual.sugar)$out
+
+```
+
+
+
+
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(chlorides)
+boxplot(chlorides)
+
+
+```
+```{r}
+
+#existen mas de 100 valores extremos en esta variable
+boxplot.stats(chlorides)$out
+
+```
+
+
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(free.sulfur.dioxide)
+boxplot(free.sulfur.dioxide)
+
+
+
+```
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(total.sulfur.dioxide)
+boxplot(total.sulfur.dioxide)
+
+```
+
+
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(density)
+boxplot(density)
+
+```
+
+
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(pH)
+boxplot(pH)
+
+```
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(sulphates)
+boxplot(sulphates)
+
+
+```
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(alcohol)
+boxplot(alcohol)
+
+
+```
+```{r}
+
+par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
+hist(quality)
+boxplot(quality)
+
+
+###podemos considerarla categoricas
+
+```
+
+>> decidir con que variables se aplican tratamiento de valores extremos.
+>> en algunas variables se ha cuantificado los outliers hacerlo en todas? en cuales intervenimos?
+
+4. Análisis de los datos.
+4.1. Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar).
+
+#podemos establecer grupos/categorias segun la calidad.
+#por ejemplo calidad alta cuando calidad por encima 7
+
+```{r}
+
+vinos.calidadAlta <- data[data$quality >= 7,]
+#Se obtienen 217 observaciones
+NROW(vinos.calidadAlta)
+
+
+```
+
+
+
+4.2. Comprobación de la normalidad y homogeneidad de la varianza.
+
+```{r}
+
+
+#install.packages("nortest")
+
+
+library(nortest)
+
+alpha = 0.05
+col.names = colnames(data)
+for (i in 1:ncol(data)) {
+if (i == 1) cat("Variables que no siguen una distribución normal:\n")
+if (is.integer(data[,i]) | is.numeric(data[,i])) {
+p_val = ad.test(data[,i])$p.value
+if (p_val < alpha) {
+cat(col.names[i])
+# Format output
+if (i < ncol(data) - 1) cat(", ")
+if (i %% 3 == 0) cat("\n")
+}
+}
+}
+
+
+```
+
+
+#Analizamos la normalidad con el ‘density plot’ y el ‘qqplot’ 
+
+
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(fixed.acidity),main="Density")
+qqnorm(fixed.acidity)
+
+
+```
+#fixed.acidity , parece seguir una distribucion normal observando el grafico : q-q
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(volatile.acidity),main="Density")
+qqnorm(volatile.acidity)
+
+
+```
+
+#volatile.acidity , parece seguir una distribucion normal observando el grafico : q-q
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(citric.acid),main="Density")
+qqnorm(citric.acid)
+
+
+```
+
+#citric.acid , su extremo izquierdo se desvia de la normal observando el grafico : q-q
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(residual.sugar),main="Density")
+qqnorm(residual.sugar)
+
+
+```
+#residual.sugar , los valores centrales se desvian de la normal observando el grafico : q-q
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(chlorides),main="Density")
+qqnorm(chlorides)
+
+
+```
+#chlorides , los valores centrales se desvian de la normal observando el grafico : q-q
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(free.sulfur.dioxide),main="Density")
+qqnorm(free.sulfur.dioxide)
+
+
+```
+#free.sulfur.dioxide , parece seguir una distribucion normal observando el grafico : q-q
+
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(total.sulfur.dioxide),main="Density")
+qqnorm(total.sulfur.dioxide)
+
+
+```
+#total.sulfur.dioxide , parece seguir una distribucion normal observando el grafico : q-q
+
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(density),main="Density")
+qqnorm(density)
+
+
+```
+#density(density , parece seguir una distribucion normal observando el grafico : q-q
+
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(pH),main="Density")
+qqnorm(pH)
+
+
+```
+#density(pH , parece seguir una distribucion normal observando el grafico : q-q
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(sulphates),main="Density")
+qqnorm(sulphates)
+
+
+```
+#density(density(sulphates , parece seguir una distribucion normal observando el grafico : q-q
+
+
+```{r}
+
+par(mfrow=c(1,2))
+plot(density(alcohol),main="Density")
+qqnorm(alcohol)
+
+
+```
+
+
+```{r}
+fligner.test(quality ~ residual.sugar, data = data)
+```
+
+
+4.3. Aplicación de pruebas estadísticas para comparar los grupos de datos. En función de los datos y el objetivo del estudio, aplicar pruebas de contraste de hipótesis, correlaciones, regresiones, etc. Aplicar al menos tres métodos de análisis diferentes.
+
+```{r}
+summary(alcohol)
+```
+
+
+Contraste de hipotesis:
+
+
+Se aplica la prueba estadistica de contraste de hipótesis sobre dos muestras para determinar si el nivel de calidad el vino es superior dependiendo de la categoria calaculada en funcion del alcohol, Se considera nivel bajo de alcohol las muestras con un valor por debajo de la media (10.42) y nivel alto cuando la muestra tiene un valor superior o igual a 10.42.
+
+Para ello, tendremos dos muestras: la primera de ellas se
+corresponderá los vinos con de nivel bajo de alcohol  y, la segunda, con aquellos
+que presentan un valor alto de alcohol.
+
+Se debe destacar que un test paramétrico como el que a continuación se utiliza necesita que
+los datos sean normales, si la muestra es de tamaño inferior a 30. Como en nuestro caso,
+n > 30, el contraste de hipótesis siguiente es válido (aunque podría utilizarse un test no
+paramétrico como el de Mann-Whitney, que podría resultar ser más eficiente para este caso).
+
+
+```{r}
+
+data_AlcoholBajo <- data[data$alcohol < 10.42,]$quality
+data_AlcoholAlto <- data[data$alcohol >= 10.42,]$quality
+
+
+```
+
+
+
+Así, se plantea el siguiente contraste de hipótesis de dos muestras sobre la diferencia
+de medias, el cual es unilateral atendiendo a la formulación de la hipótesis alternativa:
+H0 : μ1 − μ2 = 0
+H1 : μ1 − μ2 < 0
+donde μ1 es la media de la población de la que se extrae la primera muestra y μ2 es la media
+de la población de la que extrae la segunda. Así, tomaremos  = 0, 05.
+
+```{r}
+
+t.test(data_AlcoholBajo, data_AlcoholAlto,
+alternative = "less")
+
+
+```
+
+```{r}
+install.packages("ggplot2")
+```
+
+
+```{r}
+
+library("ggplot2")
+
+data$AlcoholCat <- ifelse(data$alcohol < 10.42 , "Bajo", "Alto")
+
+ #diagramas de caja:  distribucion de la variable ‘Weight‘ según la variable ‘portero‘
+  ggplot(data =data, aes(x=AlcoholCat,y=quality)) + geom_boxplot() 
+
+
+```
+
+
+
+
+
+Puesto que obtenemos un p-valor menor que el valor de significación fijado, rechazamos la
+hipótesis nula. Por tanto, podemos concluir que, efectivamente, la calidad de un vino es
+superior si éste tiene un nivel alto de alcohol.
+
+
+Analisis de la correlacion.
+
+
+```{r}
+corr_matrix <- matrix(nc = 2, nr = 0)
+colnames(corr_matrix) <- c("estimate", "p-value")
+
+
+```
+
+
+
+
+```{r}
+
+# Calcular el coeficiente de correlación para cada variable cuantitativa
+# con respecto al campo "quality"
+for (i in 1:(ncol(data) - 1)) {
+if (is.integer(data[,i]) | is.numeric(data[,i])) {
+spearman_test = cor.test(data[,i],data[,length(data)],method = "spearman")
+corr_coef = spearman_test$estimate
+p_val = spearman_test$p.value
+# Add row to matrix
+pair = matrix(ncol = 2, nrow = 1)
+pair[1][1] = corr_coef
+pair[2][1] = p_val
+corr_matrix <- rbind(corr_matrix, pair)
+rownames(corr_matrix)[nrow(corr_matrix)] <- colnames(data)[i]
+}
+}
+
+
+```
+```{r}
+
+corr_matrix
+
+```
+#correlacion con la variable Qualiy?
+
+```{r}
+
+corr.res<-cor(data[,-12], method="spearman")
+corr.res
+
+
+```
+```{r}
+
+#install.packages("corrplot")
+
+
+library(corrplot)
+
+corrplot.mixed(corr.res,upper="ellipse",number.cex=.9,tl.cex=.8)
+
+```
+
+
+
+Modelo de regresión lineal
+
+```{r}
+modelo1 <- lm(quality ~ alcohol + sulphates + citric.acid + volatile.acidity)
+
+summary(modelo1)
+```
+
+
+```{r}
+
+modelo2 <- lm(quality ~ fixed.acidity + volatile.acidity  + citric.acid  + residual.sugar)
+
+summary(modelo2)
+
+```
+
+```{r}
+
+
+modelo3 <- lm(quality ~ fixed.acidity + volatile.acidity  + citric.acid  + residual.sugar +chlorides+ free.sulfur.dioxide + total.sulfur.dioxide)
+
+summary(modelo3)
+
+
+```
+
+Regresion logistica:
+
+Creamos una variable dicotomica para aplicar la regresion logistica. CalidadAlta será igual a 1 cuando los valores de la vartiable quality sean suyperiores o iguales a 6
+
+```{r}
+
+data$CalidadAlta <- ifelse( data$quality >=6 , 1, 0)
+#revisamos los valores
+table(data$quality, data$CalidadAlta)
+
+
+```
+
+```{r}
+model.logist1=glm(formula=CalidadAlta ~ alcohol + sulphates + pH + density,   data = data,family=binomial(link=logit))
+summary(model.logist1)
+```
+
+
+
+
+5. Representación de los resultados a partir de tablas y gráficas.
+
+
+```{r}
+
+
+plot (data)
+
+```
+
+
+6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las
+conclusiones? ¿Los resultados permiten responder al problema?
