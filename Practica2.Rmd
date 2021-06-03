@@ -7,7 +7,7 @@ output: html_document
 
 
 
-1. Descripción del dataset. ¿Por qué es importante y qué pregunta/problema pretende responder?
+## 1. Descripción del dataset. ¿Por qué es importante y qué pregunta/problema pretende responder?
 
 El conjunto de datos objeto de análisis se ha obtenido a partir de este enlace en Kaggle. El dataset está formado por 12 variables (columnas) y 1599 registrs (filas).
 
@@ -28,24 +28,23 @@ Estas son las variables del conjunto de datos:
 Output variable (based on sensory data):
 12 - quality (score between 0 and 10)
 
-La principal variable de estos datos es la calidad. 
-Con este estudio se pretende esclarecer cuáles de las características afectan a la puntuación de dicha calidad, con valores de entre 0 y 10.
+La principal característica de estos datos es la calidad. Con este estudio se pretende esclarecer cuáles de las características afectan a la puntuación de dicha calidad, con valores de entre 0 y 10.
 
 Además, en la descripción del dataset publicado, ya se nos informa de que no hay valores perdidos.
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
 ```
+
+
+
 ```{r}
-
-setwd("C:/")
-
-data <- read.csv("winequality-red.csv", header = TRUE)
+# Carga de los datos
+#setwd("C:/")
+data <- read.csv('winequality-red.csv', sep=',', header = TRUE)
 head(data)
-
 ```
-
 
 Mostramos el resumen del conjunto de datos.
 Además, vamos a realizar un análisis exploratorio de los datos.
@@ -67,58 +66,49 @@ Enumeramos el número de variables del data set.
 
 ```{r}
 colnames(data)
-
-
 ```
 Visualizamos el tipo de datos de cada variable del conjunto de datos.
 
 ```{r}
 # Tipo de dato asignado a cada campo
 sapply(data, function(x) class(x))
-
 ```
 
-2. Integración y selección de los datos de interés a analizar.
+## 2. Integración y selección de los datos de interés a analizar.
 
-#En el caso de los datos utilizados para esta practica solamente hay un dataset.La integración o fusión de los datos consiste en la combinación de datos procedentes de múltiples fuentes, con el fin de crear una estructura de datos coherente y única que contenga mayor cantidad de información.
-#De lo anterior el aparatado de integración no aplica, al conjunto de datos seleccionados.
+En el caso de los datos utilizados para esta practica solamente hay un dataset.La integración o fusión de los datos consiste en la combinación de datos procedentes de múltiples fuentes, con el fin de crear una estructura de datos coherente y única que contenga mayor cantidad de información.
+De lo anterior, el aparatado de integración no aplica al conjunto de datos seleccionados.
 
-#selección de variables:
-#ideas a valorar solo analizar las muestras cuya calidad sea superior al 7?
+selección de variables:
+Ideas a valorar solo analizar las muestras cuya calidad sea superior al 7?
 
+En esta fase también es habitual realizar una exploración de los datos (screening, en inglés), con el objetivo de analizar globalmente sus características e identificar fuertes correlaciones entre atributos, de modo que se pueda prescindir de aquella información más redundante.
 
-#En esta fase también es habitual realizar una exploración de los datos (screening, en inglés), con el objetivo de analizar globalmente sus características e identificar fuertes correlaciones entre atributos, de modo que se pueda prescindir de aquella información más redundante.
-
-
-#Idea a valorar: prodiamos analizar las variables. análisis de componentes principales (ACP),
-##apartado análisis de componentes principales (ACP),
+Idea a valorar: podríamos analizar las variables. análisis de componentes principales (ACP), apartado análisis de componentes principales (ACP),
 
 ```{r}
-
 ##Análisis de componentes principales (ACP),
-
 data.pca <- prcomp(data[,c(1:11)], center = TRUE, scale = TRUE)
 summary(data.pca)
-
 ```
-El resultado son 11 componentes principales (PC1-PC11), cada una de las cuales explica un porcentaje de varianza del dataset original. Así, la primera componente principal explica prácticamente 2/3 de la varianza total y las 5 primeras componentes describen en torno al 80 % de la varianza. Dado que las ocho primeras componentes ya explican en torno al 95 % de la varianza,
+
+
+El resultado son 11 componentes principales (PC1-PC11), cada una de las cuales explica un porcentaje de varianza del dataset original. Así, la primera componente principal explica prácticamente 2/3 de la varianza total y las 5 primeras componentes describen en torno al 80 % de la varianza. Dado que las ocho primeras componentes ya explican en torno al 95 % de la varianza,????
 
 
 
-3. Limpieza de los datos.
+## 3. Limpieza de los datos.
 
+### 3.1. ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos?
 
+Tras aplicar la función summary, hemos podido observar que no hay ningún valor perdido en ninguna de las variables del dataset, aunque a veces los datasets, en lugar de contener NA o simplemente no tener ningún valor asignado (campo vacío), tienen 0. Sin embargo en este caso, podemos observar que solo la variable Citric acid tiene algún valor 0. 
 
-3.1. ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos?
-
-
-Procedemos a revisar los valores NA:
-
+Igualmente vamos a proceder a realizar algunos test para la gestión de estos valores.
 ```{r}
 # Números de valores desconocidos por campo
 sapply(data, function(x) sum(is.na(x)))
-
 ```
+
 Se observa que no existen valores NA en el dataset, lo cual coincide con la descripción localizada en la url donde se aloja el conjunto de datos estudiado.
 
 
@@ -126,103 +116,89 @@ A continuación analizamos las variables con valores igual a 0 dentro del conjun
 
 ```{r}
 #vemos que porcentaje por columnas tienen los valores 0
-
 colSums(data==0)/nrow(data)*100
 ```
-
 
 ```{r}
 # Números de valores 0 por campo
 colSums(data==0)
-
 ```
 Respuesta: Se observa que existen valores 0, en la variable "citric.acid" hay 132 observaciones igual a 0.
 
-
-
 Analizamos la posible existencia de valores no informados.
 ```{r}
-
 # Números de valores enpty por campo
 sapply(data, function(x) sum(data==""))
-
-
-
 ```
 
 Respuesta: Se observa que no existen campos no informados en el dataset.
 
-``
+### 3.2. Identificación y tratamiento de valores extremos.
 
-
-
-3.2. Identificación y tratamiento de valores extremos.
 
 Respuesta: A continuación vamos a explorar más detalladamente las variables para analizar la existencia de valores extremos.
-
 
 Analizamos la distribución de los valores y realizamos un box-plot por variable.
 
 ```{r}
-attach(data)
-
+for (i in 1:ncol(data)){
+  if (is.numeric(data[,i])){
+  boxplot(data[,i], main = colnames(data)[i],col=(c("#76D7C4")))
+  }
+}
 ```
-
 
 
 ```{r}
+for (i in 1:ncol(data)){
+  if (is.numeric(data[,i])){
+  hist(data[,i], main = colnames(data)[i],col=(c("#ff6961")))
+  }
+}
+```
 
+```{r}
+attach(data)
+```
+
+```{r}
 #Observamos la distribuccion de los valores de la variable :citric.acid
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(citric.acid)
-boxplot(citric.acid)
-
+hist(citric.acid, col=(c("#AA4371")))
+boxplot(citric.acid, main="citric acid", col=(c("#0066FF")))
 ```
+
 En la Variable "citric.acid" se entiende que las observaciones pueden ser valores reales y que estan correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(fixed.acidity)
-boxplot(fixed.acidity)
+hist(fixed.acidity, col=(c("#AA4371")))
+boxplot(fixed.acidity, main="fixed acidity",col=(c("#0066FF")))
 ```
 En la Variable "fixed.acidity" se entiende que las observaciones pueden ser valores reales y que estan correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(volatile.acidity )
-boxplot(volatile.acidity )
-
-
+hist(volatile.acidity, col=(c("#AA4371")))
+boxplot(volatile.acidity, main="volatile acidity",col=(c("#0066FF")))
 ```
 
 En la Variable "volatile.acidity" se entiende que las observaciones pueden ser valores reales y que estan correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
 
 
-```{r}
 
-par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(citric.acid)
-boxplot(citric.acid)
 
-```
-
-En la Variable "citric.acid" se entiende que las observaciones pueden ser valores reales y que estan correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
 
 ```{r}
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(residual.sugar)
-boxplot(residual.sugar)
-
+hist(residual.sugar, col=(c("#AA4371")))
+boxplot(residual.sugar, main="residual sugar", col=(c("#0066FF")))
 ```
 
 
 ```{r}
-
-#existen mas de 150 valores extremos en esta variable
+#existen mas de 150 valores extremos en esta variable. Vamos a visualizarlos:
 boxplot.stats(residual.sugar)$out
-
 ```
 
 Se decide que los valores por encima de 10 van a ser considerados outliers.
@@ -230,75 +206,55 @@ Se decide que los valores por encima de 10 van a ser considerados outliers.
 ```{r}
 #asignamos el valor NA a los casos que van a ser considerados outliers
 data$residual.sugar[data$residual.sugar>10 ] <- NA
-
 boxplot(data$residual.sugar)
-
-
 ```
 
 ```{r}
-
 idx <- which(is.na(data$residual.sugar))
 length(idx) #número de valores perdidos
-
 ```
 
 
 ```{r}
-
 #Imputamos el valor de la mediana a los valores NA.
 for (i in 1:length(idx)){
 index <- idx[i]
 data[index,]$residual.sugar <- median( data$residual.sugar, na.rm=TRUE ) #imputación
 }
-
 #mostramos los valores imputados a los NA
 data$residual.sugar[idx] #mostramos el resultado
-
 ```
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(data$residual.sugar)
-boxplot(data$residual.sugar)
-
-
+hist(data$residual.sugar, col=(c("#AA4371")))
+boxplot(data$residual.sugar, main="residual sugar", col=(c("#0066FF")))
 ```
 Volvemos a mostrar la distribucion de los datos de la variable residual.sugar , para comprobar que no exiten valores por encima de 10.
 
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(chlorides)
-boxplot(chlorides)
-
-
+hist(chlorides, col=(c("#AA4371")))
+boxplot(chlorides, main="chlorides", col=(c("#0066FF")))
 ```
-```{r}
 
-#existen mas de 100 valores extremos en esta variable
+
+```{r}
+#existen más de 100 valores extremos en esta variable
 boxplot.stats(chlorides)$out
-
 ```
 
 
-De manera analoga a la variable anterior se decide considerar outliers a los valores superiores a 0,3 a estas observaciones se les asignará el valor de la mediana.
+De manera análoga a la variable anterior, se decide considerar outliers a los valores superiores a 0,3. A estas observaciones se les asignará el valor de la mediana.
 
 
 ```{r}
-
 #asignamos el valor NA a los casos que van a ser considerados outliers
 data$chlorides[data$chlorides>0.3 ] <- NA
-
   
-
-
 idx <- which(is.na(data$chlorides))
-length(idx) #número de valores perdidos    
-
-
+length(idx) #número de valores perdidos  
 
 #Imputamos el valor de la mediana a los valores NA.
 for (i in 1:length(idx)){
@@ -306,192 +262,138 @@ index <- idx[i]
 data[index,]$chlorides <- median( data$chlorides, na.rm=TRUE ) #imputación
 }
 
-
-
-
 ```
 
 
 ```{r}
-
-boxplot(data$chlorides)   
+boxplot(data$chlorides, main="chlorides", col=(c("#0066FF")))  
 ```
 
 
-Volvemos a mostrar la distribucion de los datos de la variable chlorides , para comprobar que no exiten valores por encima de 10.
+Volvemos a mostrar la distribución de los datos de la variable chlorides , para comprobar que no exiten valores por encima de 10.
 
 
 
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(free.sulfur.dioxide)
-boxplot(free.sulfur.dioxide)
-
-
-
+hist(free.sulfur.dioxide, col=(c("#AA4371")))
+boxplot(free.sulfur.dioxide, main="sulfur dioxide", col=(c("#0066FF")))
 ```
 
-Vamos a considerar outliers los valores por encima de 60  a estas observaciones se les asignará el valor de la mediana.
+Vamos a considerar outliers los valores por encima de 60. A estas observaciones se les asignará el valor de la mediana.
 
 
 ```{r}
-
 #asignamos el valor NA a los casos que van a ser considerados outliers
 data$free.sulfur.dioxide[data$free.sulfur.dioxide>60 ] <- NA
-
-
 idx <- which(is.na(data$free.sulfur.dioxide))
 length(idx) #número de valores perdidos    
-
-
-
 #Imputamos el valor de la mediana a los valores NA.
 for (i in 1:length(idx)){
 index <- idx[i]
 data[index,]$free.sulfur.dioxide <- median( data$free.sulfur.dioxide, na.rm=TRUE ) #imputación
 }
-
-
-
 ```
 
 ```{r}
-
-boxplot(data$free.sulfur.dioxide)  
-
+boxplot(data$free.sulfur.dioxide, main="sulfur dioxide", col=(c("#0066FF"))) 
 ```
 
-Revisamos que ya no exsistan valores por encima e 60 en esta variable.
+Revisamos que ya no exsistan valores por encima de 60 en esta variable.
 
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(total.sulfur.dioxide)
-boxplot(total.sulfur.dioxide)
-
+hist(total.sulfur.dioxide, col=(c("#AA4371")))
+boxplot(total.sulfur.dioxide, main="total sulfur dioxide", col=(c("#0066FF")))
 ```
 
 
 
-Vamos a considerar outliers los valores por encima de 170  a estas observaciones se les asignará el valor de la mediana.
+Vamos a considerar outliers los valores por encima de 170. A estas observaciones se les asignará el valor de la mediana.
 
 ```{r}
 #asignamos el valor NA a los casos que van a ser considerados outliers
 data$total.sulfur.dioxide[data$total.sulfur.dioxide>170 ] <- NA
-
-
-
 idx <- which(is.na(data$total.sulfur.dioxide))
 length(idx) #número de valores perdidos    
-
-
-
 #Imputamos el valor de la mediana a los valores NA.
 for (i in 1:length(idx)){
 index <- idx[i]
 data[index,]$total.sulfur.dioxide <- median( data$total.sulfur.dioxide, na.rm=TRUE ) #imputación
 }
-
-
 ```
 
 ```{r}
-boxplot(data$total.sulfur.dioxide)    
-
+boxplot(data$total.sulfur.dioxide, main="total sulfur dioxide", col=(c("#0066FF"))) 
 ```
 Comprobamos que ya no exiten valores por encima de 170.
 
 
 
-
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(density)
-boxplot(density)
-
+hist(density, col=(c("#AA4371")))
+boxplot(density, main="density", col=(c("#0066FF")))
 ```
 
 En la Variable "density" se entiende que las observaciones pueden ser valores reales y que estan correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(pH)
-boxplot(pH)
-
+hist(pH, col=(c("#AA4371")))
+boxplot(pH, main="pH", col=(c("#0066FF")))
 ```
 
-En la Variable "ph" se entiende que las observaciones pueden ser valores reales y que estan correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
+En la Variable "ph" se entiende que las observaciones pueden ser valores reales y que están correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(sulphates)
-boxplot(sulphates)
-
-
+hist(sulphates, col=(c("#AA4371")))
+boxplot(sulphates, main="sulphates", col=(c("#0066FF")))
 ```
 
 
-Vamos a considerar outliers los valores por encima de 1,5 a estas observaciones se les asignará el valor de la mediana.
+Vamos a considerar outliers los valores por encima de 1,5. A estas observaciones se les asignará el valor de la mediana.
 
 ```{r}
-
 #asignamos el valor NA a los casos que van a ser considerados outliers
 data$sulphates[data$sulphates>1.5 ] <- NA
  
-
-
 idx <- which(is.na(data$sulphates))
 length(idx) #número de valores perdidos    
-
-
-
 #Imputamos el valor de la mediana a los valores NA.
 for (i in 1:length(idx)){
 index <- idx[i]
 data[index,]$sulphates <- median( data$sulphates, na.rm=TRUE ) #imputación
 }
-
-
 ```
 
 ```{r}
-
-boxplot(data$sulphates)   
+boxplot(data$sulphates, main="sulphates", col=(c("#0066FF")))
 ```
-Comprobamos que ya no exisnte valores por envima de 1,5
+Comprobamos que ya no exisnte valores por encima de 1,5
 
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(alcohol)
-boxplot(alcohol)
-
-
+hist(alcohol, col=(c("#AA4371")))
+boxplot(alcohol, main="alcohol", col=(c("#0066FF")))
 ```
 
-En la Variable "alcohol" se entiende que las observaciones pueden ser valores reales y que estan correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
+En la Variable "alcohol" se entiende que las observaciones pueden ser valores reales y que están correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
 
 
 ```{r}
-
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
-hist(quality)
-boxplot(quality)
-
-
+hist(quality, col=(c("#AA4371")))
+boxplot(quality, main="quality", col=(c("#0066FF")))
 ###podemos considerarla categoricas
-
 ```
 
-Conclusiones de los criterios adoptados:
-residual.sugar: Se decide que los valores por encima de 10 van a ser considerados outliers.
+### Conclusiones de los criterios adoptados:
+residual.sugar: se decide que los valores por encima de 10 van a ser considerados outliers.
 chlorides: se decide considerar outliers a los valores superiores a 0,3
 free.sulfur.dioxide: se decide considerar outliers los valores por encima de 60.
 total.sulfur.dioxide: se considerar outliers los valores por encima de 170.
@@ -501,23 +403,24 @@ A todos esos casos se ha decidido imputar el valor de la mediana, exluidos los c
 En el resto de variables. no se han realizado modificaciones de los datos.
 
 
-4. Análisis de los datos.
-4.1. Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar).
+##4. Análisis de los datos.
 
-Analisis de los casos según el nivel de alcohol.
+###4.1. Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar).
+
+Análisis de los casos según el nivel de alcohol.
 
 ```{r}
-
 vinos.calidadAlta <- data[data$quality >= 7,]
 #Se obtienen 217 observaciones
 NROW(vinos.calidadAlta)
 
-
+#En términos porcentuales supone un 13,57%
+NROW(vinos.calidadAlta)/NROW(data)
 ```
-Existen 217 muestras cuyos valores de la variable quality es igual o superior a 7.
+Existen 217 muestras cuyos valores de la variable quality es igual o superior a 7, lo que supone un 13,57% sobre el total del dataset.
 
 
-4.2. Comprobación de la normalidad y homogeneidad de la varianza.
+###4.2. Comprobación de la normalidad y homogeneidad de la varianza.
 
 Indicar que Por el teorema del límite central, podemos asumir normalidad, puesto que tenemos una muestra de tamaño
 grande n=1600 observaciones y se desea realizar un test sobre la media.
@@ -525,13 +428,8 @@ grande n=1600 observaciones y se desea realizar un test sobre la media.
 Analizamos la normalidad la variables con el ad.test de la libreria nortest.
 
 ```{r}
-
-
 #install.packages("nortest")
-
-
 library(nortest)
-
 alpha = 0.05
 col.names = colnames(data)
 for (i in 1:ncol(data)) {
@@ -546,8 +444,6 @@ if (i %% 3 == 0) cat("")
 }
 }
 }
-
-
 ```
 
 
@@ -556,118 +452,85 @@ Analizamos la normalidad con el ‘density plot’ y el ‘qqplot’
 
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(fixed.acidity),main="Density")
 qqnorm(fixed.acidity)
-
-
 ```
-fixed.acidity , parece seguir una distribucion normal observando el grafico : q-q
+fixed.acidity: parece seguir una distribucion normal observando el grafico : q-q
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(volatile.acidity),main="Density")
 qqnorm(volatile.acidity)
-
-
 ```
 
-volatile.acidity , parece seguir una distribucion normal observando el grafico : q-q
+volatile.acidity: parece seguir una distribución normal observando el grafico : q-q
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(citric.acid),main="Density")
 qqnorm(citric.acid)
-
-
 ```
 
-citric.acid , su extremo izquierdo se desvia de la normal observando el grafico : q-q
+citric.acid: su extremo izquierdo se desvía de la normal observando el grafico : q-q
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(residual.sugar),main="Density")
 qqnorm(residual.sugar)
-
-
 ```
-residual.sugar , los valores centrales se desvian de la normal observando el grafico : q-q
+residual.sugar: los valores centrales se desvían de la normal observando el grafico : q-q
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(chlorides),main="Density")
 qqnorm(chlorides)
-
-
 ```
-chlorides , los valores centrales se desvian de la normal observando el grafico : q-q
+chlorides: los valores centrales se desvían de la normal observando el grafico : q-q
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(free.sulfur.dioxide),main="Density")
 qqnorm(free.sulfur.dioxide)
-
-
 ```
-free.sulfur.dioxide , parece seguir una distribucion normal observando el grafico : q-q
+free.sulfur.dioxide: parece seguir una distribución normal observando el grafico : q-q
 
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(total.sulfur.dioxide),main="Density")
 qqnorm(total.sulfur.dioxide)
-
-
 ```
-total.sulfur.dioxide , parece seguir una distribucion normal observando el grafico : q-q
+total.sulfur.dioxide: parece seguir una distribución normal observando el grafico : q-q
 
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(density),main="Density")
 qqnorm(density)
-
-
 ```
-density(density , parece seguir una distribucion normal observando el grafico : q-q
+density(density , parece seguir una distribución normal observando el grafico : q-q
 
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(pH),main="Density")
 qqnorm(pH)
-
-
 ```
-density(pH , parece seguir una distribucion normal observando el grafico : q-q
+density(pH): parece seguir una distribución normal observando el grafico : q-q
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(sulphates),main="Density")
 qqnorm(sulphates)
-
-
 ```
-sulphates , parece seguir una distribucion normal observando el grafico : q-q
+sulphates: parece seguir una distribución normal observando el grafico : q-q
 
 
 ```{r}
-
 par(mfrow=c(1,2))
 plot(density(alcohol),main="Density")
 qqnorm(alcohol)
-
-
 ```
 
 
@@ -679,10 +542,7 @@ un test de Fligner-Killeen. En este caso, estudiaremos esta homogeneidad. En el 
 fligner.test(quality ~ residual.sugar, data = data)
 ```
 
-Puesto que obtenemos un p-valor superior a 0,05, aceptamos la hipótesis de que las varianzas
-de ambas muestras son homogéneas.
-
-
+Puesto que obtenemos un p-valor superior a 0,05, aceptamos la hipótesis de que las varianzas de ambas muestras son homogéneas.
 
 
 
@@ -696,24 +556,20 @@ summary(alcohol)
 Contraste de hipotesis:
 
 
-Se aplica la prueba estadistica de contraste de hipótesis sobre dos muestras para determinar si el nivel de calidad el vino es diferente dependiendo de la categoria calculada en funcion del alcohol, Se considera nivel bajo de alcohol las muestras con un valor por debajo de la media (10.42) y nivel alto cuando la muestra tiene un valor superior o igual a 10.42.
+Se aplica la prueba estadistica de contraste de hipótesis sobre dos muestras para determinar si el nivel de calidad el vino es diferente dependiendo de la categoría calculada en función del alcohol. Se considera nivel bajo de alcohol las muestras con un valor por debajo de la media (10.42) y nivel alto cuando la muestra tiene un valor superior o igual a 10.42.
 
-Para ello, tendremos dos categorias: la primera de ellas corresponderá los vinos con de nivel bajo de alcohol  y, la segunda, con aquellos que presentan un valor alto de alcohol.
+Para ello, tendremos dos categorias: la primera de ellas corresponderá a los vinos con de nivel bajo de alcohol  y, la segunda, con aquellos que presentan un valor alto de alcohol.
 
 
 
 ```{r}
-
 data_AlcoholBajo <- data[data$alcohol < 10.42,]$quality
 data_AlcoholAlto <- data[data$alcohol >= 10.42,]$quality
-
-
 ```
 
 
 
-
-Nos preguntamos si la calidad del los vinos puede ser diferente en función de la categoria creada en funcion del grado de alcohol de la muestras. (anteriormente descrita)
+Nos preguntamos si la calidad del los vinos puede ser diferente en función de la categoría creada en función del grado de alcohol de la muestras. (anteriormente descrita)
 
 En este escenario la hipótesis nula y la alternativa.
 
@@ -725,7 +581,6 @@ Comprobamos igualdad de varianzas:
 
 ```{r}
 var.test( data_AlcoholBajo, data_AlcoholAlto )
-
 ```
 El resultado del test es un valor p<0.05. Por tanto, asumimos diferencias de varianzas.
 En consecuencia, el test se corresponde con un test de dos muestras independientes sobre la media con
@@ -736,12 +591,10 @@ varianzas desconocidas diferentes. El test es bilateral.
 ```{r}
 t.test( data_AlcoholBajo, data_AlcoholAlto,
 var.equal=FALSE, alternative="two.sided")
-
-
 ```
 
 Conclusión:
-Nos encontramos con un p-value por debajo de 0.05 por lo que podemos indicar que podemos aceptar la hipotesis alternativa.
+Nos encontramos con un p-value por debajo de 0.05 por lo que podemos indicar que podemos aceptar la hipótesis alternativa.
 Podemos indicar que la calidad de los vinos es diferente entre los considerados como nivel bajo de alcohol y los vinos con un nivel alto de alcohol con un nivel de confianza del 95%.
 
 
@@ -751,19 +604,14 @@ Podemos indicar que la calidad de los vinos es diferente entre los considerados 
 
 
 ```{r}
-
 library("ggplot2")
-
 data$AlcoholCat <- ifelse(data$alcohol < 10.42 , "Bajo", "Alto")
-
  #diagramas de caja:  distribucion de la variable ‘Weight‘ según la variable ‘portero‘
   ggplot(data =data, aes(x=AlcoholCat,y=quality)) + geom_boxplot() 
-
-
 ```
 
 
-Representación gráfica del nivel de calidad frente a la categorias realizadas en función de la variable alcohol consideradas.
+Representación gráfica del nivel de calidad frente a la categorías realizadas en función de las variables de alcohol consideradas.
 
 
 
@@ -775,14 +623,10 @@ Análisis de la correlación.
 ```{r}
 corr_matrix <- matrix(nc = 2, nr = 0)
 colnames(corr_matrix) <- c("estimate", "p-value")
-
-
 ```
 
 
-
 ```{r}
-
 # Calcular el coeficiente de correlación para cada variable cuantitativa
 # con respecto al campo "quality"
 for (i in 1:(ncol(data) - 1)) {
@@ -798,13 +642,10 @@ corr_matrix <- rbind(corr_matrix, pair)
 rownames(corr_matrix)[nrow(corr_matrix)] <- colnames(data)[i]
 }
 }
-
-
 ```
+
 ```{r}
-
 corr_matrix
-
 ```
 
 Así, identificamos cuáles son las variables más correlacionadas con el precio en función de su
@@ -814,25 +655,19 @@ Nota. Para cada coeficiente de correlación se muestra también su p-valor asoci
 que éste puede dar información acerca del peso estadístico de la correlación obtenida.
 
 
-#correlacion con la variable Qualiy
+Correlacion con la variable Quality:
 
 ```{r}
-
 corr.res<-cor(data[,-13], method="spearman")
 corr.res
-
-
 ```
+
 ```{r}
-
 #install.packages("corrplot")
-
-
 #library(corrplot)
-
-corrplot.mixed(corr.res,upper="ellipse",number.cex=.6,tl.cex=.6)
+corrplot::corrplot.mixed(corr.res, upper="ellipse",number.cex=.6,tl.cex=.6)
 ```
-Se analiza adicionalmente la correlacion de forma gráfica.
+Se analiza adicionalmente la correlación de forma gráfica.
 
 
 Modelo de regresión lineal:
@@ -841,29 +676,21 @@ Incialmente realizamos un modelo lineal con las 4 variables mas correlacionadas 
 
 ```{r}
 modelo1 <- lm(quality ~ alcohol +volatile.acidity + sulphates + citric.acid )
-
 summary(modelo1)
 ```
-Posteriormente realizamos un modelo lineal con las 5 variables mas correlacionadas con la variable "quality"
+Posteriormente realizamos un modelo lineal con las 5 variables más correlacionadas con la variable "quality" (simplemente añadimos total sulfur dioxide al modelo anterior)
 
 ```{r}
-
 modelo2 <- lm(quality ~ alcohol +volatile.acidity + sulphates + citric.acid + total.sulfur.dioxide)
-
 summary(modelo2)
-
 ```
-Finalmente realizamos un modelo lineal con las 7 variables mas correlacionadas con la variable "quality"
+
+Finalmente realizamos un modelo lineal con las 7 variables mas correlacionadas con la variable "quality" (simplemente añadimos total density al modelo anterior)
 ```{r}
-
-
 modelo3 <- lm(quality ~ alcohol +volatile.acidity + sulphates + citric.acid + chlorides +total.sulfur.dioxide +density)
-
 summary(modelo3)
-
-
 ```
-Al revisar R-squared, se observa como al incluyendo más variables se mejora , aunque no mucho la precisión del modelo.
+Al revisar R-squared, se observa cómo al ir incluyendo más variables se mejora, aunque no mucho, la precisión del modelo.
 
 
 
@@ -872,16 +699,13 @@ Regresion logistica:
 Creamos una variable dicotómica para aplicar la regresión logistica. CalidadAlta será igual a 1 cuando los valores de la variable quality sean superiores o iguales a 6
 
 ```{r}
-
 data$CalidadAlta <- ifelse( data$quality >=6 , 1, 0)
 #revisamos los valores
 table(data$quality, data$CalidadAlta)
-
-
 ```
 
 ```{r}
-model.logist1=glm(formula=CalidadAlta ~ alcohol           +volatile.acidity +sulphates+citric.acid +chlorides+total.sulfur.dioxide,   data = data,family=binomial(link=logit))
+model.logist1=glm(formula=CalidadAlta ~ alcohol +volatile.acidity +sulphates+citric.acid +chlorides+total.sulfur.dioxide,   data = data,family=binomial(link=logit))
 summary(model.logist1)
 ```
 
@@ -892,17 +716,13 @@ summary(model.logist1)
 
 
 ```{r}
-
-
 plot (data)
-
 ```
 
 
-6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las
-conclusiones? ¿Los resultados permiten responder al problema?
+##6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las conclusiones? ¿Los resultados permiten responder al problema?
 
-En el preprocesamiento de los datos  valores extremos (outliers). Se han utilizado los siguientes criterios  adoptados segun las variables del conjunto de datos:
+En el preprocesamiento de los datos  valores extremos (outliers), se han utilizado los siguientes criterios adoptados según las variables del conjunto de datos:
 -residual.sugar: Se decide que los valores por encima de 10 van a ser considerados outliers.
 -chlorides: se decide considerar outliers a los valores superiores a 0,3
 -free.sulfur.dioxide: se decide considerar outliers los valores por encima de 60.
@@ -912,15 +732,23 @@ En el preprocesamiento de los datos  valores extremos (outliers). Se han utiliza
 A todos esos casos se ha decidido imputar el valor de la mediana, exluidos los casos considerados outliers.          
 En el resto de variables. no se han realizado modificaciones de los datos.
 
-De analisis de los datos podemos indicar que:
+De análisis de los datos, podemos indicar que:
 
-Del contraste de hipotesis realizado podemos indicar que la calidad de los vinos es diferente entre los considerados como nivel bajo de alcohol y los vinos con un nivel alto de alcohol con un nivel de confianza del 95%. Por lo observado parece que el nivel de calidad puede ser superior para los vinos con un nivel alto de alcohol.
+Del contraste de hipotesis realizado, la calidad de los vinos es diferente entre los considerados como nivel bajo de alcohol y nivel alto, con un nivel de confianza del 95%. Por lo observado, parece que el nivel de calidad puede ser superior para los vinos con un nivel alto de alcohol.
 
-Del anailisis de la correlaciones podemos indicar que las variables : alcohol,volatile.acidity , sulphates, citric.acid  ,chlorides son las mas correlacionadas con el nivel de calidad de los vinos del dataset, esto es, cuáles de son las variables del data set que ejercen una mayor influencia sobre el la calidad del vino.
+Del análisis de la correlaciones podemos indicar que las variables alcohol, volatile.acidity, sulphates, citric.acid y chlorides son las más correlacionadas con el nivel de calidad de los vinos del dataset. Esto significa que son las variables del dataset que ejercen una mayor influencia sobre el la calidad del vino.
 
-Adicionalmente hemos realizados diferentes modelos de regresion lineales y logistica, que serían utiles para  realizar predicciones sobre la calidad dadas unas características concretas, de las otras variables.
+Adicionalmente hemos realizados diferentes modelos de regresión, lineales y logística, que serían útiles para  realizar predicciones sobre la calidad dadas unas características concretas, de las otras variables.
 
-De lo anterior podemos indicar que del analisis de los datos podemos aclarar como algunas de las variables del conjunto de datos están relacionadas con el problema planteado, conocer la calidad del vino.
+De lo anterior podemos indicar que del análisis de los datos podemos aclarar cómo algunas de las variables del conjunto de datos están relacionadas con el problema planteado, conocer la calidad del vino.
+
+
+
+
+## 7. Código: Hay que adjuntar el código, preferiblemente en R, con el que se ha realizado la limpieza, análisis y representación de los datos. Si lo preferís, también podéis trabajar en Python.
+
+
+
 
 
 
