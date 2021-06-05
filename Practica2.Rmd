@@ -405,9 +405,9 @@ A todos esos casos se ha decidido imputar el valor de la mediana, exluidos los c
 En el resto de variables. no se han realizado modificaciones de los datos.
 
 
-##4. Análisis de los datos.
+## 4. Análisis de los datos.
 
-###4.1. Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar).
+### 4.1. Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar).
 
 Análisis de los casos según el nivel de alcohol.
 
@@ -422,7 +422,7 @@ NROW(vinos.calidadAlta)/NROW(data)
 Existen 217 muestras cuyos valores de la variable quality es igual o superior a 7, lo que supone un 13,57% sobre el total del dataset.
 
 
-###4.2. Comprobación de la normalidad y homogeneidad de la varianza.
+### 4.2. Comprobación de la normalidad y homogeneidad de la varianza.
 
 Indicar que por el teorema del límite central, podemos asumir normalidad, puesto que tenemos una muestra de tamaño
 grande n=1600 observaciones y se desea realizar un test sobre la media.
@@ -548,19 +548,21 @@ Puesto que obtenemos un p-valor superior a 0,05, aceptamos la hipótesis de que 
 
 
 
-4.3. Aplicación de pruebas estadísticas para comparar los grupos de datos. En función de los datos y el objetivo del estudio, aplicar pruebas de contraste de hipótesis, correlaciones, regresiones, etc. Aplicar al menos tres métodos de análisis diferentes.
+### 4.3. Aplicación de pruebas estadísticas para comparar los grupos de datos. En función de los datos y el objetivo del estudio, aplicar pruebas de contraste de hipótesis, correlaciones, regresiones, etc. Aplicar al menos tres métodos de análisis diferentes.
 
 ```{r}
 summary(alcohol)
 ```
 
 
-Contraste de hipotesis:
+Contraste de hipótesis:
 
 
 Se aplica la prueba estadistica de contraste de hipótesis sobre dos muestras para determinar si el nivel de calidad el vino es diferente dependiendo de la categoría calculada en función del alcohol. Se considera nivel bajo de alcohol las muestras con un valor por debajo de la media (10.42) y nivel alto cuando la muestra tiene un valor superior o igual a 10.42.
 
-Para ello, tendremos dos categorias: la primera de ellas corresponderá a los vinos con de nivel bajo de alcohol  y, la segunda, con aquellos que presentan un valor alto de alcohol.
+Para ello, tendremos dos categorias: 
+  - Vinos con nivel bajo de alcohol
+  - Vinos con nivel alto de alcohol
 
 
 
@@ -683,9 +685,24 @@ summary(modelo1)
 Posteriormente realizamos un modelo lineal con las 5 variables más correlacionadas con la variable "quality" (simplemente añadimos total sulfur dioxide al modelo anterior)
 
 ```{r}
+# Intervalos de confianza
+confint(modelo1)
+# En caso de querer los intervalos basados en el error estándar.
+confint.default(modelo1)
+```
+
+```{r}
 modelo2 <- lm(quality ~ alcohol +volatile.acidity + sulphates + citric.acid + total.sulfur.dioxide)
 summary(modelo2)
 ```
+
+```{r}
+# Intervalos de confianza
+confint(modelo2)
+# En caso de querer los intervalos basados en el error estándar.
+confint.default(modelo2)
+```
+
 
 Finalmente realizamos un modelo lineal con las 7 variables mas correlacionadas con la variable "quality" (simplemente añadimos total density al modelo anterior)
 ```{r}
@@ -694,7 +711,12 @@ summary(modelo3)
 ```
 Al revisar R-squared, se observa cómo al ir incluyendo más variables se mejora, aunque no mucho, la precisión del modelo.
 
-
+```{r}
+# Intervalos de confianza
+confint(modelo3)
+# En caso de querer los intervalos basados en el error estándar.
+confint.default(modelo3)
+```
 
 Regresion logistica:
 
@@ -716,7 +738,7 @@ summary(model.logist1)
 
 
 
-5. Representación de los resultados a partir de tablas y gráficas.
+## 5. Representación de los resultados a partir de tablas y gráficas.
 
 
 
@@ -724,17 +746,12 @@ summary(model.logist1)
 Relativo al contraste de hipotesis, podemos observar:
 
 ```{r}
-
-
-
- #diagramas de caja:  distribucion de la variable categorica ‘Alcohol‘ según la variable ‘quality‘
-  ggplot(data =data, aes(x=AlcoholCat,y=quality)) + geom_boxplot() 
-
-
-
-
+library("ggplot2")
+data$AlcoholCat <- ifelse(data$alcohol < 10.42 , "Bajo", "Alto")
+  ggplot(data =data, aes(x=AlcoholCat,y=quality, color = AlcoholCat )) + geom_boxplot() +
+  geom_jitter(width = 0.1)
 ```
-
+Esta representaación nos ayuda a observar fácilmente que existe una diferencia notoria entre el grado de alcohol alto o bajo en relación con la calidad.
 Podemos observar que para las muestras consideradas nivel de alcohol Alto, se obtiene un valor de quality superior a la quality de las muestras consideras nivel bajo de alcohol.
 
 
@@ -761,6 +778,16 @@ layout(matrix(c(1,2,3,4),2,2))
 plot(modelo3)
 
 
+```
+
+```{r}
+# Con las siguientes representaciones, nos hacemos una idea de cómo se comportan las variables alcohol,volatile.acidity, sulphates, citric.acid, total.sulfur.dioxide y density, en relación con la calidad del vino
+scatter.smooth(data$quality, data$alcohol)
+scatter.smooth(data$quality, data$volatile.acidity)
+scatter.smooth(data$quality, data$sulq)
+scatter.smooth(data$quality, data$citric.acid)
+scatter.smooth(data$quality, data$total.sulfur.dioxide)
+scatter.smooth(data$quality, data$density)
 ```
 
 
@@ -809,7 +836,7 @@ library(caret)
 Estimación de la precisión del modelo logistico
 Vamos a proporcionar la tabla de confusión correspondiente al modelo. 
 
-se adopta como criterio que las predicciones obtenidas con el modelo logistico por encima de 0,5 pertenecerian al grupo de calidad alta.
+Se adopta como criterio que las predicciones obtenidas con el modelo logístico por encima de 0,5 pertenecerían al grupo de calidad alta.
 Anteriormente hemos definido: CalidadAlta será igual a 1 cuando los valores de la variable quality sean superiores o iguales a 6
 
 ```{r}
@@ -819,12 +846,12 @@ confusionMatrix(table(predict(model.logist1, type="response") >= 0.5,data$Calida
 
 
 ```
-Se obteniene de esta manera que el modelo logistico tiene una precision superior al 70%.
+Se obteniene de esta manera que el modelo logístico tiene una precisión superior al 70%.
 
 
 
 
-##6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las conclusiones? ¿Los resultados permiten responder al problema?
+## 6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las conclusiones? ¿Los resultados permiten responder al problema?
 
 En el preprocesamiento de los datos  valores extremos (outliers), se han utilizado los siguientes criterios adoptados según las variables del conjunto de datos:
 -residual.sugar: Se decide que los valores por encima de 10 van a ser considerados outliers.
