@@ -1,6 +1,6 @@
 ---
 title: "practica 2"
-author: "meeu"
+author: "Elena Canton y Manuel E. Escobar"
 date: "7/5/2021"
 output: html_document
 ---
@@ -73,6 +73,7 @@ Visualizamos el tipo de datos de cada variable del conjunto de datos.
 # Tipo de dato asignado a cada campo
 sapply(data, function(x) class(x))
 ```
+Obbservamos que son todas numericas. 
 
 ## 2. Integración y selección de los datos de interés a analizar.
 
@@ -80,7 +81,7 @@ En el caso de los datos utilizados para esta practica solamente hay un dataset.L
 De lo anterior, el aparatado de integración no aplica al conjunto de datos seleccionados.
 
 selección de variables:
-Ideas a valorar solo analizar las muestras cuya calidad sea superior al 7?
+Ideas a valorar solo analizar las muestras cuya calidad sea superior al 7
 
 En esta fase también es habitual realizar una exploración de los datos (screening, en inglés), con el objetivo de analizar globalmente sus características e identificar fuertes correlaciones entre atributos, de modo que se pueda prescindir de aquella información más redundante.
 
@@ -93,7 +94,7 @@ summary(data.pca)
 ```
 
 
-El resultado son 11 componentes principales (PC1-PC11), cada una de las cuales explica un porcentaje de varianza del dataset original. Así, la primera componente principal explica prácticamente 2/3 de la varianza total y las 5 primeras componentes describen en torno al 80 % de la varianza. Dado que las ocho primeras componentes ya explican en torno al 95 % de la varianza,????
+El resultado son 11 componentes principales (PC1-PC11), cada una de las cuales explica un porcentaje de varianza del dataset original. Así, la primera componente principal explica un poco menos de las 2/3 de la varianza total y las 5 primeras componentes describen en torno al 80 % de la varianza. Dado que las ocho primeras componentes ya explican en torno al 95 % de la varianza,
 
 
 
@@ -104,6 +105,7 @@ El resultado son 11 componentes principales (PC1-PC11), cada una de las cuales e
 Tras aplicar la función summary, hemos podido observar que no hay ningún valor perdido en ninguna de las variables del dataset, aunque a veces los datasets, en lugar de contener NA o simplemente no tener ningún valor asignado (campo vacío), tienen 0. Sin embargo en este caso, podemos observar que solo la variable Citric acid tiene algún valor 0. 
 
 Igualmente vamos a proceder a realizar algunos test para la gestión de estos valores.
+
 ```{r}
 # Números de valores desconocidos por campo
 sapply(data, function(x) sum(is.na(x)))
@@ -338,7 +340,7 @@ hist(density, col=(c("#AA4371")))
 boxplot(density, main="density", col=(c("#0066FF")))
 ```
 
-En la Variable "density" se entiende que las observaciones pueden ser valores reales y que estan correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
+En la Variable "density" se entiende que las observaciones pueden ser valores reales y que estan correctamente informadas. De lo anterior no aplicaremos transformaciones para estos datos.
 
 ```{r}
 par(mfrow=c(1,2))    # set the plotting area into a 1*2 array
@@ -382,7 +384,7 @@ hist(alcohol, col=(c("#AA4371")))
 boxplot(alcohol, main="alcohol", col=(c("#0066FF")))
 ```
 
-En la Variable "alcohol" se entiende que las observaciones pueden ser valores reales y que están correctamente informados. De lo anterior no aplicaremos transformaciones para estos datos.
+En la Variable "alcohol" se entiende que las observaciones pueden ser valores reales y que están correctamente informadas. De lo anterior no aplicaremos transformaciones para estos datos.
 
 
 ```{r}
@@ -422,7 +424,7 @@ Existen 217 muestras cuyos valores de la variable quality es igual o superior a 
 
 ###4.2. Comprobación de la normalidad y homogeneidad de la varianza.
 
-Indicar que Por el teorema del límite central, podemos asumir normalidad, puesto que tenemos una muestra de tamaño
+Indicar que por el teorema del límite central, podemos asumir normalidad, puesto que tenemos una muestra de tamaño
 grande n=1600 observaciones y se desea realizar un test sobre la media.
 
 Analizamos la normalidad la variables con el ad.test de la libreria nortest.
@@ -648,7 +650,7 @@ rownames(corr_matrix)[nrow(corr_matrix)] <- colnames(data)[i]
 corr_matrix
 ```
 
-Así, identificamos cuáles son las variables más correlacionadas con el precio en función de su
+Así, identificamos cuáles son las variables más correlacionadas con la calidad del vino en función de su
 proximidad con los valores -1 y +1. Teniendo esto en cuenta, queda patente cómo la variable
 más relevante en la calidad del vino es el alcohol .
 Nota. Para cada coeficiente de correlación se muestra también su p-valor asociado, puesto
@@ -704,6 +706,8 @@ data$CalidadAlta <- ifelse( data$quality >=6 , 1, 0)
 table(data$quality, data$CalidadAlta)
 ```
 
+Revisamos los valores introducidos en la nueva variable y su relación con el contenido en la variable "quality"
+
 ```{r}
 model.logist1=glm(formula=CalidadAlta ~ alcohol +volatile.acidity +sulphates+citric.acid +chlorides+total.sulfur.dioxide,   data = data,family=binomial(link=logit))
 summary(model.logist1)
@@ -715,9 +719,109 @@ summary(model.logist1)
 5. Representación de los resultados a partir de tablas y gráficas.
 
 
+
+
+Relativo al contraste de hipotesis, podemos observar:
+
 ```{r}
-plot (data)
+
+
+
+ #diagramas de caja:  distribucion de la variable categorica ‘Alcohol‘ según la variable ‘quality‘
+  ggplot(data =data, aes(x=AlcoholCat,y=quality)) + geom_boxplot() 
+
+
+
+
 ```
+
+Podemos observar que para las muestras consideradas nivel de alcohol Alto, se obtiene un valor de quality superior a la quality de las muestras consideras nivel bajo de alcohol.
+
+
+
+Visualizamos los datos asociados a cada modelo, en especial el grafico Normal Q-Q y el gráfico de
+residuos frente valores ajustados,
+
+```{r}
+layout(matrix(c(1,2,3,4),2,2))
+plot(modelo1)
+
+```
+
+```{r}
+layout(matrix(c(1,2,3,4),2,2))
+plot(modelo2)
+
+
+```
+
+
+```{r}
+layout(matrix(c(1,2,3,4),2,2))
+plot(modelo3)
+
+
+```
+
+
+Realizamos una tabla de comparación entre los modelos lineales implementados.
+
+```{r}
+
+# Tabla con los coeficientes de determinación de cada modelo
+tabla.coeficientes <- matrix(c(
+1, summary(modelo1)$r.squared,
+2, summary(modelo2)$r.squared,
+3, summary(modelo3)$r.squared), ncol = 2, byrow = TRUE)
+colnames(tabla.coeficientes) <- c("Modelo", "R^2")
+tabla.coeficientes
+
+
+```
+Se observa que el modelo lineal 3 es ligeramente mejor que sus predecesores.
+
+
+Respecto al modelo logistico podemos realizar la visualización de los odds ratio de las variables regresoras mediante un intervalo de confianza del 95% e interpreta los intervalos obtenidos. ¿Qué regresor tiene más impacto en la probabilidad de calidad alta del vino?
+
+
+```{r}
+exp(cbind(coef(model.logist1),confint(model.logist1)))
+
+
+```
+Podemos indicar que el mayor impacto en incrementar la calidad del vino es alcohol.
+
+
+
+```{r}
+
+#install.packages("caret")
+#install.packages("e1071")
+ 
+#Import required library
+library(caret)
+
+
+```
+
+
+
+Estimación de la precisión del modelo logistico
+Vamos a proporcionar la tabla de confusión correspondiente al modelo. 
+
+se adopta como criterio que las predicciones obtenidas con el modelo logistico por encima de 0,5 pertenecerian al grupo de calidad alta.
+Anteriormente hemos definido: CalidadAlta será igual a 1 cuando los valores de la variable quality sean superiores o iguales a 6
+
+```{r}
+
+
+confusionMatrix(table(predict(model.logist1, type="response") >= 0.5,data$CalidadAlta == "1"))
+
+
+```
+Se obteniene de esta manera que el modelo logistico tiene una precision superior al 70%.
+
+
 
 
 ##6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las conclusiones? ¿Los resultados permiten responder al problema?
