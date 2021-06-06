@@ -47,6 +47,14 @@ head(data)
 ```
 
 Mostramos el resumen del conjunto de datos.
+
+```{r}
+str(data)
+```
+
+La variable str nos permite ver que hay 12 variables y 1599 observaciones. La variable respuesta es "quality", la calidad del vino. El conjunto cuenta con 11 variables predictoras de clase numérica, y 1 de tipo integer,  quality.
+
+
 Además, vamos a realizar un análisis exploratorio de los datos.
 La función summary nos proporciona un resumen estadístico sobre las variables (mínimo, máximo, media, mediana, primer y tercer cuartil). Además, si hay valores faltantes también nos informará.
 
@@ -55,13 +63,6 @@ La función summary nos proporciona un resumen estadístico sobre las variables 
 summary(data)
 ```
 
-
-El número elementos de la muestra es:
-
-```{r}
-# contamos el numero de registros
-NROW(data)
-```
 Enumeramos el número de variables del data set.
 
 ```{r}
@@ -673,6 +674,12 @@ corrplot::corrplot.mixed(corr.res, upper="ellipse",number.cex=.6,tl.cex=.6)
 ```
 Se analiza adicionalmente la correlación de forma gráfica.
 
+```{r}
+par(mfrow = c(1,1))
+cor.data <- cor(data)
+corrplot(cor.data, method = 'number')
+```
+Se pueden apreciar relaciones débiles entre residual sugar, free sulfur dioxide, ph, fixed acidity y density.
 
 Modelo de regresión lineal:
 
