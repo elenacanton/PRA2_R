@@ -2,9 +2,19 @@
 title: "practica 2"
 author: "Elena Canton y Manuel E. Escobar"
 date: "7/5/2021"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
+
+Contribuciones según apartados - 	Firma:
+Investigación previa :            Manuel / Elena
+Redacción de las respuestas	:     Manuel / Elena
+Desarrollo código	:               Manuel / Elena
+
+
+URL github: https://github.com/elenacanton/PRA2_R
 
 
 ## 1. Descripción del dataset. ¿Por qué es importante y qué pregunta/problema pretende responder?
@@ -675,9 +685,9 @@ corrplot::corrplot.mixed(corr.res, upper="ellipse",number.cex=.6,tl.cex=.6)
 Se analiza adicionalmente la correlación de forma gráfica.
 
 ```{r}
-par(mfrow = c(1,1))
-cor.data <- cor(data)
-corrplot(cor.data, method = 'number')
+#par(mfrow = c(1,1))
+#cor.data <- cor(data)
+#corrplot(cor.data, method = 'number')
 ```
 Se pueden apreciar relaciones débiles entre residual sugar, free sulfur dioxide, ph, fixed acidity y density.
 
@@ -894,6 +904,7 @@ De lo anterior podemos indicar que del análisis de los datos podemos aclarar c�
 write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALSE)
 
 ```
+
 
 
 
