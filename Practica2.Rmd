@@ -887,7 +887,13 @@ De lo anterior podemos indicar que del an√°lisis de los datos podemos aclarar c√
 
 
 
+#exportacion de datos tras el tratamiento:
 
+```{r}
+
+write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALSE)
+
+```
 
 
 
