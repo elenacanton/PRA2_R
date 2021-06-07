@@ -141,24 +141,8 @@ Respuesta: Se observa que no existen campos no informados en el dataset.
 
 Respuesta: A continuación vamos a explorar más detalladamente las variables para analizar la existencia de valores extremos.
 
-Analizamos la distribución de los valores y realizamos un box-plot por variable.
+Analizamos la distribución de los valores y realizamos un box-plot y un historgrama por cada una de las variables.
 
-```{r}
-for (i in 1:ncol(data)){
-  if (is.numeric(data[,i])){
-  boxplot(data[,i], main = colnames(data)[i],col=(c("#76D7C4")))
-  }
-}
-```
-
-
-```{r}
-for (i in 1:ncol(data)){
-  if (is.numeric(data[,i])){
-  hist(data[,i], main = colnames(data)[i],col=(c("#ff6961")))
-  }
-}
-```
 
 ```{r}
 attach(data)
@@ -676,10 +660,10 @@ Se analiza adicionalmente la correlación de forma gráfica.
 
 ```{r}
 par(mfrow = c(1,1))
-cor.data <- cor(data)
+cor.data <- cor(data[,-13])
 corrplot(cor.data, method = 'number')
 ```
-Se pueden apreciar relaciones débiles entre residual sugar, free sulfur dioxide, ph, fixed acidity y density.
+Se pueden apreciar relaciones débiles entre residual sugar, free sulfur dioxide, ph, fixed acidity y density con respecto a la variable que tratamos de explicar, quality.
 
 Modelo de regresión lineal:
 
@@ -891,7 +875,9 @@ De lo anterior podemos indicar que del análisis de los datos podemos aclarar c�
 
 ```{r}
 
-write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALSE)
+write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALSE) # Para especificar un directorio distinto al actual
+# Con la siguiente función se exportan los datos a un fichero csv llamado winequality_modificado en el working directory en el que estemos trabajando.
+write.csv(data,'winequality_modificado.csv', row.names = FALSE)
 
 ```
 
