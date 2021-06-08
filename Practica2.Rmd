@@ -897,7 +897,7 @@ De lo anterior podemos indicar que del análisis de los datos podemos aclarar c�
 
 ```{r}
 
-write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALSE) # Para especificar un directorio distinto al actual
+# write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALSE) # Para especificar un directorio distinto al actual
 # Con la siguiente función se exportan los datos a un fichero csv llamado winequality_modificado en el working directory en el que estemos trabajando.
 write.csv(data,'winequality_modificado.csv', row.names = FALSE)
 
