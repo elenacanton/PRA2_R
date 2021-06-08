@@ -151,24 +151,8 @@ Respuesta: Se observa que no existen campos no informados en el dataset.
 
 Respuesta: A continuación vamos a explorar más detalladamente las variables para analizar la existencia de valores extremos.
 
-Analizamos la distribución de los valores y realizamos un box-plot por variable.
+Analizamos la distribución de los valores y realizamos un box-plot y un historgrama por cada una de las variables.
 
-```{r}
-for (i in 1:ncol(data)){
-  if (is.numeric(data[,i])){
-  boxplot(data[,i], main = colnames(data)[i],col=(c("#76D7C4")))
-  }
-}
-```
-
-
-```{r}
-for (i in 1:ncol(data)){
-  if (is.numeric(data[,i])){
-  hist(data[,i], main = colnames(data)[i],col=(c("#ff6961")))
-  }
-}
-```
 
 ```{r}
 attach(data)
@@ -589,6 +573,7 @@ Nos preguntamos si la calidad del los vinos puede ser diferente en función de l
 En este escenario la hipótesis nula y la alternativa.
 
 H0 : μAlcBajo = μAlcAlto
+
 H1 : μAlcBajo =! μAlcAlto
 
 Es un test de dos muestras sobre la media con varianzas desconocidas. Por el teorema del límite central, podemos asumir normalidad.
@@ -682,14 +667,19 @@ corr.res
 #library(corrplot)
 corrplot::corrplot.mixed(corr.res, upper="ellipse",number.cex=.6,tl.cex=.6)
 ```
+
+
+
+
 Se analiza adicionalmente la correlación de forma gráfica.
 
 ```{r}
-#par(mfrow = c(1,1))
-#cor.data <- cor(data)
-#corrplot(cor.data, method = 'number')
+library(corrplot)
+par(mfrow = c(1,1))
+cor.data <- cor(data[,-13])
+corrplot(cor.data, method = 'number')
 ```
-Se pueden apreciar relaciones débiles entre residual sugar, free sulfur dioxide, ph, fixed acidity y density.
+Se pueden apreciar relaciones débiles entre residual sugar, free sulfur dioxide, ph, fixed acidity y density con respecto a la variable que tratamos de explicar, quality.
 
 Modelo de regresión lineal:
 
@@ -699,7 +689,7 @@ Incialmente realizamos un modelo lineal con las 4 variables mas correlacionadas 
 modelo1 <- lm(quality ~ alcohol +volatile.acidity + sulphates + citric.acid )
 summary(modelo1)
 ```
-Posteriormente realizamos un modelo lineal con las 5 variables más correlacionadas con la variable "quality" (simplemente añadimos total sulfur dioxide al modelo anterior)
+
 
 ```{r}
 # Intervalos de confianza
@@ -707,6 +697,9 @@ confint(modelo1)
 # En caso de querer los intervalos basados en el error estándar.
 confint.default(modelo1)
 ```
+
+
+Posteriormente realizamos un modelo lineal con las 5 variables más correlacionadas con la variable "quality" (simplemente añadimos total sulfur dioxide al modelo anterior)
 
 ```{r}
 modelo2 <- lm(quality ~ alcohol +volatile.acidity + sulphates + citric.acid + total.sulfur.dioxide)
@@ -722,6 +715,7 @@ confint.default(modelo2)
 
 
 Finalmente realizamos un modelo lineal con las 7 variables mas correlacionadas con la variable "quality" (simplemente añadimos total density al modelo anterior)
+
 ```{r}
 modelo3 <- lm(quality ~ alcohol +volatile.acidity + sulphates + citric.acid + chlorides +total.sulfur.dioxide +density)
 summary(modelo3)
@@ -768,13 +762,15 @@ data$AlcoholCat <- ifelse(data$alcohol < 10.42 , "Bajo", "Alto")
   ggplot(data =data, aes(x=AlcoholCat,y=quality, color = AlcoholCat )) + geom_boxplot() +
   geom_jitter(width = 0.1)
 ```
-Esta representaación nos ayuda a observar fácilmente que existe una diferencia notoria entre el grado de alcohol alto o bajo en relación con la calidad.
+
+
+
+En esta representación de la calidad relacionada con el alcohol de las muestras.
 Podemos observar que para las muestras consideradas nivel de alcohol Alto, se obtiene un valor de quality superior a la quality de las muestras consideras nivel bajo de alcohol.
 
 
 
-Visualizamos los datos asociados a cada modelo, en especial el grafico Normal Q-Q y el gráfico de
-residuos frente valores ajustados,
+A continuación vamos a Visualizar los datos asociados a cada modelo, en especial el grafico Normal Q-Q y el gráfico de residuos frente valores ajustados,
 
 ```{r}
 layout(matrix(c(1,2,3,4),2,2))
@@ -901,7 +897,9 @@ De lo anterior podemos indicar que del análisis de los datos podemos aclarar c�
 
 ```{r}
 
-write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALSE)
+write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALSE) # Para especificar un directorio distinto al actual
+# Con la siguiente función se exportan los datos a un fichero csv llamado winequality_modificado en el working directory en el que estemos trabajando.
+write.csv(data,'winequality_modificado.csv', row.names = FALSE)
 
 ```
 
