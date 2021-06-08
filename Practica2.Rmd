@@ -2,9 +2,19 @@
 title: "practica 2"
 author: "Elena Canton y Manuel E. Escobar"
 date: "7/5/2021"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
+
+Contribuciones según apartados - 	Firma:
+Investigación previa :            Manuel / Elena
+Redacción de las respuestas	:     Manuel / Elena
+Desarrollo código	:               Manuel / Elena
+
+
+URL github: https://github.com/elenacanton/PRA2_R
 
 
 ## 1. Descripción del dataset. ¿Por qué es importante y qué pregunta/problema pretende responder?
@@ -892,6 +902,7 @@ write.csv(data,"C:\\Users\\Usuario\\winquality_modificado.csv", row.names = FALS
 write.csv(data,'winequality_modificado.csv', row.names = FALSE)
 
 ```
+
 
 
 
